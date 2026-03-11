@@ -7,13 +7,25 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class HelloApplication extends Application {
+public class ScheduleRun extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("DoctorSchedule.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        stage.setTitle("Hello!");
+        FXMLLoader fxmlLoader = new FXMLLoader(ScheduleRun.class.getResource("DoctorSchedule.fxml"));
+
+        // Note: For full screen, the initial dimensions (320, 240) will be ignored
+        Scene scene = new Scene(fxmlLoader.load());
+
+        stage.setTitle("Doctor Schedule");
         stage.setScene(scene);
+
+        // --- Full Screen Options ---
+
+        // Option A: True Full Screen (Kiosk mode, hides taskbar)
+        stage.setFullScreen(true);
+
+        // Option B: Maximized (Shows taskbar, fills available space)
+        // stage.setMaximized(true);
+
         stage.show();
     }
 
