@@ -13,12 +13,12 @@ import java.util.ResourceBundle;
 public class ScheduleController implements Initializable {
 
     // --- Table View and Columns ---
-    @FXML private TableView<Appointment> appointmentTable;
-    @FXML private TableColumn<Appointment, String> colTime;
-    @FXML private TableColumn<Appointment, String> colPatient;
-    @FXML private TableColumn<Appointment, String> colType;
-    @FXML private TableColumn<Appointment, String> colStatus;
-    @FXML private TableColumn<Appointment, String> colNotes;
+    @FXML private TableView<Schedule> appointmentTable;
+    @FXML private TableColumn<Schedule, String> colTime;
+    @FXML private TableColumn<Schedule, String> colPatient;
+    @FXML private TableColumn<Schedule, String> colType;
+    @FXML private TableColumn<Schedule, String> colStatus;
+    @FXML private TableColumn<Schedule, String> colNotes;
 
     // --- Input Fields ---
     @FXML private TextField txtName;
@@ -30,7 +30,7 @@ public class ScheduleController implements Initializable {
     @FXML private Button btnBook;
 
     // --- Data List ---
-    private final ObservableList<Appointment> appointmentList = FXCollections.observableArrayList();
+    private final ObservableList<Schedule> scheduleList = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -48,10 +48,10 @@ public class ScheduleController implements Initializable {
         colNotes.setCellValueFactory(cell -> cell.getValue().notesProperty());
 
         // Load dummy data
-        appointmentList.add(new Appointment("09:00 AM", "Sarah Smith", "Check-up", "Confirmed", "Annual Physical"));
-        appointmentList.add(new Appointment("10:30 AM", "Mike Johnson", "Surgery", "Pending", "Wisdom Tooth"));
+        scheduleList.add(new Schedule("09:00 AM", "Sarah Smith", "Check-up", "Confirmed", "Annual Physical"));
+        scheduleList.add(new Schedule("10:30 AM", "Mike Johnson", "Surgery", "Pending", "Wisdom Tooth"));
 
-        appointmentTable.setItems(appointmentList);
+        appointmentTable.setItems(scheduleList);
     }
 
     private void setupInputs() {
@@ -61,8 +61,12 @@ public class ScheduleController implements Initializable {
         comboType.getItems().addAll("Check-up", "Consultation", "Emergency", "Follow-up");
     }
 
+    // Change this line:
+    @FXML private Button btnBookSchedule; // Matches fx:id="btnBookSchedule"
+
+    // And update the reference in setupActions:
     private void setupActions() {
-        btnBook.setOnAction(event -> handleBookAppointment());
+        btnBookSchedule.setOnAction(event -> handleBookAppointment());
     }
 
     private void handleBookAppointment() {
@@ -78,10 +82,10 @@ public class ScheduleController implements Initializable {
         String type = comboType.getValue() != null ? comboType.getValue() : "General";
         String notes = txtReason.getText();
 
-        Appointment newAppt = new Appointment(time, name, type, "Scheduled", notes);
+        Schedule newAppt = new Schedule(time, name, type, "Scheduled", notes);
 
         // 3. Add to list (Table updates automatically)
-        appointmentList.add(newAppt);
+        scheduleList.add(newAppt);
 
         // 4. Clear form
         clearForm();
@@ -101,5 +105,32 @@ public class ScheduleController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+    // 1. Add the @FXML reference for the top button
+    @FXML private Button btnReschedule;
+
+    // 2. Add this method to handle the Reschedule click
+    @FXML
+    private void handleReschedule() {
+        // Get the selected appointment from the table
+        Schedule selectedAppt = appointmentTable.getSelectionModel().getSelectedItem();
+
+        if (selectedAppt == null) {
+            showAlert("No Selection", "Please select an appointment from the table to reschedule.");
+            return;
+        }
+
+        // Populate the form fields on the right with the selected data
+        txtName.setText(selectedAppt.getPatientName());
+        comboTime.setValue(selectedAppt.getTime());
+        comboType.setValue(selectedAppt.getType());
+        txtReason.setText(selectedAppt.getNotes());
+
+        // Optional: Remove the old entry so it can be replaced by the "Book" action,
+        // or keep it and let the user manually delete the old one.
+        // scheduleList.remove(selectedAppt);
+
+        // UI Feedback: Change button text to indicate we are updating
+        btnBookSchedule.setText("Update Schedule");
     }
 }
